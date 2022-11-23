@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/celestiaorg/go-cnc v0.1.0
-	github.com/dgraph-io/badger/v3 v3.2103.3
+	github.com/dgraph-io/badger/v3 v3.2103.4
 	github.com/go-kit/kit v0.12.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/orderedcode v0.0.1
@@ -175,6 +175,6 @@ require (
 
 replace (
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
-	github.com/tendermint/tendermint => "../my gh/mf_tendermint"
+	github.com/tendermint/tendermint => ../my gh/mf_tendermint
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
