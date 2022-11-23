@@ -234,6 +234,9 @@ func createNode(ctx context.Context, n int, aggregator bool, dalc da.DataAvailab
 	app.On("DeliverTx", mock.Anything).Return(abci.ResponseDeliverTx{}).Run(func(args mock.Arguments) {
 		wg.Done()
 	})
+
+	// note that if we are the aggregator, then we prepare the proposal, 
+	// whereas if we are the validator we process the proposal to validate it
 	if aggregator {
 		app.On("PrepareProposal", mock.Anything).
 			Return(func(req abci.RequestPrepareProposal) abci.ResponsePrepareProposal {
@@ -242,6 +245,12 @@ func createNode(ctx context.Context, n int, aggregator bool, dalc da.DataAvailab
 	} else {
 		app.On("ProcessProposal", mock.Anything).Return(abci.ResponseProcessProposal{Result: abci.ResponseProcessProposal_ACCEPT})
 	}
+
+	// TODO: figure out exactly how these work. It looks like as you test, you can call these
+	// app.On("ExtendVote", mock.Anything).Return(abci.RequestExtendVote{Result: abci.RequestExtendVote_ACCEPT})
+	// app.On("VerifyVoteExtension", mock.Anything).Return(abci.VerifyVoteExtension{Result: abci.VerifyVoteExtension_ACCEPT})
+
+
 	if ctx == nil {
 		ctx = context.Background()
 	}

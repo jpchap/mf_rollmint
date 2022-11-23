@@ -136,6 +136,129 @@ func (e *BlockExecutor) ProcessProposal(
 	return resp.IsOK(), nil
 }
 
+func (e *BlockExecutor) ExtendVote(
+	block *types.Block,
+) (bool, error) {
+	// TODO: add vote extension type in mf_tendermint
+	signedMsgType := tmproto.UnknownType
+
+	// TODO: why is this broken?
+	height := int64(block.Header.Height)
+
+	// TODO: pull this from somewhere
+	round := int32(0)
+
+	// convert block to abci s.t. we can get the blockId
+	abci_block_header, err := abciconv.ToABCIHeaderPB(&block.Header);
+	if err != nil {
+		return false, err
+	}
+
+	// TODO: pull this from block header?
+	timestamp := time.Time{}
+	validator_address := e.proposerAddress
+
+	// TODO: verify this is correct. Sequencer should be only one using
+	validator_index := int32(0)
+
+	// TODO: verify that 0 is sequencer's signature
+	signature := block.LastCommit.Signatures[0]
+
+	// TODO: make this actually do something
+	vote_extension := tmproto.VoteExtension{
+		AppDataToSign: []byte("app data to sign"),
+		AppDataSelfAuthenticating: []byte("app data self authenticating"),
+	}
+
+	vote := tmproto.Vote{
+		Type: signedMsgType,
+		Height: height,
+		Round: round,
+		BlockID: abci_block_header.LastBlockId,
+		Timestamp: timestamp,
+		ValidatorAddress: validator_address,
+		ValidatorIndex: validator_index,
+		Signature: signature,
+		VoteExtension: &vote_extension,
+	}
+
+	pVote := vote
+
+	req := abci.RequestExtendVote{
+		&pVote,
+	}
+
+	// see if there's anything we can do with res
+	_, err2 := e.proxyApp.ExtendVoteSync(req)
+	if err2 != nil {
+		return false, err2
+	}
+
+	// Again, see if there's anything we can do with res
+	return true, nil
+}
+
+func (e *BlockExecutor) VerifyVoteExtension(
+	block *types.Block,
+) (bool, error) {
+	// TODO: add in mf_tendermint
+	signedMsgType := tmproto.UnknownType
+
+	// TODO: why is this broken?
+	height := int64(block.Header.Height)
+
+	// TODO: pull this from somewhere
+	round := int32(0)
+
+	// convert block to abci s.t. we can get the blockId
+	abci_block_header, err := abciconv.ToABCIHeaderPB(&block.Header);
+	if err != nil {
+		return false, err
+	}
+
+	// TODO: pull this from block header?
+	timestamp := time.Time{}
+	validator_address := e.proposerAddress
+
+	// TODO: verify this is correct. Sequencer should be only one using
+	validator_index := int32(0)
+
+	// TODO: verify that 0 is sequencer's signature
+	signature := block.LastCommit.Signatures[0]
+
+	// TODO: make this actually do something
+	vote_extension := tmproto.VoteExtension{
+		AppDataToSign: []byte("app data to sign"),
+		AppDataSelfAuthenticating: []byte("app data self authenticating"),
+	}
+
+	vote := tmproto.Vote{
+		Type: signedMsgType,
+		Height: height,
+		Round: round,
+		BlockID: abci_block_header.LastBlockId,
+		Timestamp: timestamp,
+		ValidatorAddress: validator_address,
+		ValidatorIndex: validator_index,
+		Signature: signature,
+		VoteExtension: &vote_extension,
+	}
+
+	pVote := vote
+
+	req := abci.RequestVerifyVoteExtension{
+		&pVote,
+	}
+
+	resp, err := e.proxyApp.VerifyVoteExtensionSync(req)
+	if err != nil {
+		return false, err
+	}
+
+	return resp.IsOK(), nil
+}
+
+
 // ApplyBlock validates and executes the block.
 func (e *BlockExecutor) ApplyBlock(ctx context.Context, state types.State, block *types.Block) (types.State, *tmstate.ABCIResponses, error) {
 	err := e.validate(state, block)

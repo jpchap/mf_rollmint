@@ -244,10 +244,13 @@ func (m *Manager) trySyncNextBlock(ctx context.Context, daHeight uint64) error {
 	var commit *types.Commit
 	currentHeight := m.store.Height() // TODO(tzdybal): maybe store a copy in memory
 
+	// get the next block from storage
 	b1, ok1 := m.syncCache[currentHeight+1]
 	if !ok1 {
 		return nil
 	}
+
+	// get the block two blocks ahead from storage
 	b2, ok2 := m.syncCache[currentHeight+2]
 	if ok2 {
 		m.logger.Debug("using last commit from next block")
@@ -262,6 +265,8 @@ func (m *Manager) trySyncNextBlock(ctx context.Context, daHeight uint64) error {
 
 	if b1 != nil && commit != nil {
 		m.logger.Info("Syncing block", "height", b1.Header.Height)
+
+		// confirm state machine deems this valid
 		ok, err := m.executor.ProcessProposal(b1)
 		if err != nil {
 			return fmt.Errorf("failed to ProcessProposal: %w", err)
@@ -269,6 +274,19 @@ func (m *Manager) trySyncNextBlock(ctx context.Context, daHeight uint64) error {
 		if !ok {
 			return fmt.Errorf("Block was rejected by ProcessProposal: %s", b1.Hash())
 		}
+
+		// in the final version this will not be done by the block manager
+		_, err = m.executor.ExtendVote(b1)
+		if err != nil {
+			return fmt.Errorf("failed to ExtendVote: %w", err)
+		}
+
+		// check that 2/3 majority exists for vote extensions
+		_, err = m.executor.VerifyVoteExtension(b1)
+		if err != nil {
+			return fmt.Errorf("failed to VerifyVoteExtension: %w", err)
+		}
+
 		newState, responses, err := m.executor.ApplyBlock(ctx, m.lastState, b1)
 		if err != nil {
 			return fmt.Errorf("failed to ApplyBlock: %w", err)
