@@ -2,6 +2,8 @@
 
 ABCI-client implementation for Optimistic Rollups.
 
+This branch specifically includes ABCI++ Vote Extensions. These will be used to decentralize the oracle set and involve them in block production.
+
 Design document: <https://docs.google.com/document/d/12gZow_JTJjRrmaD2mNTmYniLhyxVLSyDd7Fbxo5UnA8/edit?usp=sharing>
 
 [![build-and-test](https://github.com/celestiaorg/rollmint/actions/workflows/test.yml/badge.svg)](https://github.com/celestiaorg/rollmint/actions/workflows/test.yml)
