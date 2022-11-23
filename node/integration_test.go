@@ -247,8 +247,8 @@ func createNode(ctx context.Context, n int, aggregator bool, dalc da.DataAvailab
 	}
 
 	// TODO: figure out exactly how these work. It looks like as you test, you can call these
-	// app.On("ExtendVote", mock.Anything).Return(abci.RequestExtendVote{Result: abci.RequestExtendVote_ACCEPT})
-	// app.On("VerifyVoteExtension", mock.Anything).Return(abci.VerifyVoteExtension{Result: abci.VerifyVoteExtension_ACCEPT})
+	app.On("ExtendVote", mock.Anything).Return(abci.ResponseExtendVote{})
+	app.On("VerifyVoteExtension", mock.Anything).Return(abci.ResponseVerifyVoteExtension{})
 
 
 	if ctx == nil {

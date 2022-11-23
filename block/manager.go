@@ -275,14 +275,18 @@ func (m *Manager) trySyncNextBlock(ctx context.Context, daHeight uint64) error {
 			return fmt.Errorf("Block was rejected by ProcessProposal: %s", b1.Hash())
 		}
 
-		// in the final version this will not be done by the block manager
-		_, err = m.executor.ExtendVote(b1)
+		// TODO: pass in data from validators to sign
+		AppDataToSign := []byte("app data to sign")
+		sign, err := m.proposerKey.Sign(AppDataToSign)
+
+		_, err = m.executor.ExtendVote(b1, AppDataToSign, sign)
 		if err != nil {
 			return fmt.Errorf("failed to ExtendVote: %w", err)
 		}
 
 		// check that 2/3 majority exists for vote extensions
-		_, err = m.executor.VerifyVoteExtension(b1)
+		// only have the sequencer voting right now, so this is inconsequential
+		_, err = m.executor.VerifyVoteExtension(b1, AppDataToSign, sign)
 		if err != nil {
 			return fmt.Errorf("failed to VerifyVoteExtension: %w", err)
 		}

@@ -138,11 +138,12 @@ func (e *BlockExecutor) ProcessProposal(
 
 func (e *BlockExecutor) ExtendVote(
 	block *types.Block,
+	appDataToSign []byte,
+	signature []byte,
 ) (bool, error) {
 	// TODO: add vote extension type in mf_tendermint
 	signedMsgType := tmproto.UnknownType
 
-	// TODO: why is this broken?
 	height := int64(block.Header.Height)
 
 	// TODO: pull this from somewhere
@@ -158,16 +159,13 @@ func (e *BlockExecutor) ExtendVote(
 	timestamp := time.Time{}
 	validator_address := e.proposerAddress
 
-	// TODO: verify this is correct. Sequencer should be only one using
+	// only have sequencer
 	validator_index := int32(0)
 
-	// TODO: verify that 0 is sequencer's signature
-	signature := block.LastCommit.Signatures[0]
-
-	// TODO: make this actually do something
+	// TODO: get data from somewhere
 	vote_extension := tmproto.VoteExtension{
-		AppDataToSign: []byte("app data to sign"),
-		AppDataSelfAuthenticating: []byte("app data self authenticating"),
+		AppDataToSign: appDataToSign,
+		AppDataSelfAuthenticating: []byte("this is not used by oracles"),
 	}
 
 	vote := tmproto.Vote{
@@ -182,24 +180,23 @@ func (e *BlockExecutor) ExtendVote(
 		VoteExtension: &vote_extension,
 	}
 
-	pVote := vote
-
 	req := abci.RequestExtendVote{
-		&pVote,
+		&vote,
 	}
 
-	// see if there's anything we can do with res
+	// send to tmint
 	_, err2 := e.proxyApp.ExtendVoteSync(req)
 	if err2 != nil {
 		return false, err2
 	}
 
-	// Again, see if there's anything we can do with res
 	return true, nil
 }
 
 func (e *BlockExecutor) VerifyVoteExtension(
 	block *types.Block,
+	appDataToSign []byte,
+	signature []byte,
 ) (bool, error) {
 	// TODO: add in mf_tendermint
 	signedMsgType := tmproto.UnknownType
@@ -223,13 +220,10 @@ func (e *BlockExecutor) VerifyVoteExtension(
 	// TODO: verify this is correct. Sequencer should be only one using
 	validator_index := int32(0)
 
-	// TODO: verify that 0 is sequencer's signature
-	signature := block.LastCommit.Signatures[0]
-
 	// TODO: make this actually do something
 	vote_extension := tmproto.VoteExtension{
-		AppDataToSign: []byte("app data to sign"),
-		AppDataSelfAuthenticating: []byte("app data self authenticating"),
+		AppDataToSign: appDataToSign,
+		AppDataSelfAuthenticating: []byte("this is not used by oracles"),
 	}
 
 	vote := tmproto.Vote{
