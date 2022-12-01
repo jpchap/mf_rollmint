@@ -244,11 +244,11 @@ func createNode(ctx context.Context, n int, aggregator bool, dalc da.DataAvailab
 			})
 	} else {
 		app.On("ProcessProposal", mock.Anything).Return(abci.ResponseProcessProposal{Result: abci.ResponseProcessProposal_ACCEPT})
+		
+		// TODO: should only non aggregators be calling this?
+		app.On("ExtendVote", mock.Anything).Return(abci.ResponseExtendVote{})
+		app.On("VerifyVoteExtension", mock.Anything).Return(abci.ResponseVerifyVoteExtension{})
 	}
-
-	// TODO: figure out exactly how these work. It looks like as you test, you can call these
-	app.On("ExtendVote", mock.Anything).Return(abci.ResponseExtendVote{})
-	app.On("VerifyVoteExtension", mock.Anything).Return(abci.ResponseVerifyVoteExtension{})
 
 
 	if ctx == nil {

@@ -285,6 +285,8 @@ func getRPC(t *testing.T) (*mocks.Application, *client.Client) {
 		Return(func(req abci.RequestPrepareProposal) abci.ResponsePrepareProposal {
 			return abci.ResponsePrepareProposal{Txs: req.Txs}
 		})
+	app.On("ExtendVote", mock.Anything).Return(abci.ResponseExtendVote{})
+	app.On("VerifyVoteExtension", mock.Anything).Return(abci.ResponseVerifyVoteExtension{})
 	app.On("Info", mock.Anything).Return(abci.ResponseInfo{
 		Data:             "mock",
 		Version:          "mock",

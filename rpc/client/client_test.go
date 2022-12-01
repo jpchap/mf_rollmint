@@ -424,6 +424,8 @@ func TestTx(t *testing.T) {
 		Return(func(req abci.RequestPrepareProposal) abci.ResponsePrepareProposal {
 			return abci.ResponsePrepareProposal{Txs: req.Txs}
 		})
+	mockApp.On("ExtendVote", mock.Anything).Return(abci.ResponseExtendVote{})
+	mockApp.On("VerifyVoteExtension", mock.Anything).Return(abci.ResponseVerifyVoteExtension{})
 
 	err = rpc.node.Start()
 	require.NoError(err)
