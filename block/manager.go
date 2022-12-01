@@ -446,7 +446,11 @@ func (m *Manager) publishBlock(ctx context.Context) error {
 		block = pendingBlock
 	} else {
 		m.logger.Info("Creating and publishing block", "height", newHeight)
-		block = m.executor.CreateBlock(newHeight, lastCommit, lastHeaderHash, m.lastState)
+		block, err = m.executor.CreateBlock(newHeight, lastCommit, lastHeaderHash, m.lastState)
+		if err != nil {
+			return err
+		}
+		
 		m.logger.Debug("block info", "num_tx", len(block.Data.Txs))
 
 		headerBytes, err := block.Header.MarshalBinary()
