@@ -14,7 +14,7 @@ require (
 	github.com/ipfs/go-log v1.0.5
 	github.com/libp2p/go-libp2p v0.22.0
 	github.com/libp2p/go-libp2p-kad-dht v0.18.0
-	github.com/libp2p/go-libp2p-pubsub v0.8.1
+	github.com/libp2p/go-libp2p-pubsub v0.8.2
 	github.com/multiformats/go-multiaddr v0.7.0
 	github.com/prometheus/client_golang v1.13.0
 	github.com/rs/cors v1.8.2
@@ -175,6 +175,6 @@ require (
 
 replace (
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
-	github.com/tendermint/tendermint => "../my gh/mf_tendermint"
+	github.com/tendermint/tendermint => ../my gh/mf_tendermint
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
